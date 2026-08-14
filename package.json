@@ -13,8 +13,8 @@
   },
   "scripts": {
     "harness:prepare": "node scripts/prepare-harness.mjs",
-    "dev": "pnpm --filter @deepseek-desktop/host build && pnpm --filter @deepseek-desktop/connection build && pnpm --filter @deepseek-desktop/renderer prepare:plugins && electron-vite dev",
-    "build": "pnpm --filter @deepseek-desktop/host build && pnpm --filter @deepseek-desktop/connection build && pnpm --filter @deepseek-desktop/renderer prepare:plugins && electron-vite build",
+    "dev": "pnpm --filter @deepseek-desktop/connection build && pnpm --filter @deepseek-desktop/host build && pnpm --filter @deepseek-desktop/renderer prepare:plugins && electron-vite dev",
+    "build": "pnpm --filter @deepseek-desktop/connection build && pnpm --filter @deepseek-desktop/host build && pnpm --filter @deepseek-desktop/renderer prepare:plugins && electron-vite build",
     "prepare:release": "node scripts/package-release.mjs --stage-only",
     "test": "vitest run",
     "test:e2e": "playwright test",

@@ -15,6 +15,7 @@ describe('repository foundation', () => {
     expect(pkg.packageManager).toBe('pnpm@11.19.0')
     expect(pkg.scripts['harness:prepare']).toBe('node scripts/prepare-harness.mjs')
     expect(pkg.scripts['dist:win']).toBe('node scripts/package-release.mjs --win nsis portable')
+    expect(pkg.scripts.build).toMatch(/^pnpm --filter @deepseek-desktop\/connection build && pnpm --filter @deepseek-desktop\/host build/)
     expect(existsSync(join(root, 'vendor', 'deepseek-harness', '.git'))).toBe(true)
   })
 
