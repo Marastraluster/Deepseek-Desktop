@@ -2,7 +2,7 @@ appId: ai.deepseek.desktop
 productName: DeepSeek Desktop
 directories:
   output: dist
-  buildResources: build
+  buildResources: resources/generated-icons
 files:
   - apps/desktop-main/dist/**
   - apps/desktop-renderer/dist/**
@@ -19,6 +19,7 @@ extraResources:
     to: build-identity.json
 asar: true
 win:
+  icon: resources/icons/DeepSeek_AppleStyle.ico
   target:
     - nsis
     - portable
@@ -29,3 +30,14 @@ nsis:
   deleteAppDataOnUninstall: false
 portable:
   artifactName: DeepSeek-Desktop-Portable-${version}.${ext}
+mac:
+  icon: resources/generated-icons/icon.icns
+  target:
+    - dmg
+    - zip
+  artifactName: DeepSeek-Desktop-${version}-mac-${arch}.${ext}
+linux:
+  icon: resources/generated-icons/linux
+  target:
+    - AppImage
+  artifactName: DeepSeek-Desktop-${version}-linux-${arch}.${ext}

@@ -1,0 +1,12 @@
+{
+  "name": "@deepseek-desktop/main",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/main/index.js",
+  "dependencies": {
+    "@deepseek-desktop/ipc-contract": "workspace:*",
+    "@deepseek-ai/dsh-host-apiproxy": "workspace:*",
+    "electron": "^40.0.0"
+  }
+}

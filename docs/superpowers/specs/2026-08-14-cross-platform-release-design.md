@@ -12,7 +12,7 @@ Each tagged release produces native artifacts from a matching GitHub-hosted
 runner:
 
 - Windows x64: NSIS installer and portable executable.
-- macOS universal: DMG and ZIP archive.
+- macOS x64 and arm64: a DMG and ZIP archive for each CPU architecture.
 - Linux x64: AppImage.
 
 Every artifact bundles the matching Node 24 runtime and the deployed Host, so
@@ -60,9 +60,10 @@ on macOS/Linux.
 ## Automation And Publication
 
 `.github/workflows/release.yml` runs the test suite before releasing, then
-fans out to Windows, macOS, and Linux runners. It uploads artifacts and their
-SHA-256 checksums to the GitHub Release created for a pushed `v*` tag. The
-workflow uses repository `contents: write` permission only for release assets.
+fans out to Windows, Linux, Intel macOS, and Apple Silicon macOS runners. It
+uploads artifacts and their SHA-256 checksums to the GitHub Release created for
+a pushed `v*` tag. The workflow uses repository `contents: write` permission
+only for release assets.
 
 Source is pushed to the repository default branch. Releases are tag-driven;
 ordinary source pushes run validation only and do not create releases.

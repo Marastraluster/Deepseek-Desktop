@@ -1,0 +1,13 @@
+{
+  "name": "@deepseek-desktop/ipc-contract",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@deepseek-ai/dsh-host-apiproxy": "workspace:*",
+    "zod": "^4.4.3"
+  }
+}

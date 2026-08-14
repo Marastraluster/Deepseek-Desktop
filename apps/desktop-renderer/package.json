@@ -1,0 +1,30 @@
+{
+  "name": "@deepseek-desktop/renderer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "prepare:plugins": "tsx scripts/prepare-plugins.ts",
+    "build": "pnpm run prepare:plugins && vite build",
+    "dev": "pnpm run prepare:plugins && vite"
+  },
+  "dependencies": {
+    "@deepseek-ai/cordis": "workspace:*",
+    "@deepseek-ai/dsh-client-modules": "workspace:*",
+    "@deepseek-ai/dsh-client-schema-form": "workspace:*",
+    "@deepseek-ai/dsh-client-ui-attachment": "workspace:*",
+    "@deepseek-ai/dsh-client-ui-primitives": "workspace:*",
+    "@deepseek-ai/dsh-client-ui-slots": "workspace:*",
+    "@deepseek-ai/dsh-client-web": "workspace:*",
+    "@deepseek-ai/dsh-client-web-react": "workspace:*",
+    "@deepseek-desktop/ipc-client": "workspace:*",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.7.0",
+    "tsx": "^4.22.0",
+    "typescript": "^6.0.3",
+    "vite": "^6.1.0"
+  }
+}

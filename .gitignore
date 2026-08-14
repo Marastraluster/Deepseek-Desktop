@@ -13,14 +13,23 @@ dist/
 out/
 coverage/
 *.log
+*.tsbuildinfo
+apps/desktop-main/dist/
+apps/desktop-renderer/dist/
+apps/desktop-renderer/public/boot-manifest.json
+apps/desktop-renderer/public/plugins/
+packages/desktop-connection/lib/
 
 # Generated desktop runtime and installer inputs
-resources/node/
+resources/node/*
+!resources/node/checksums.json
 resources/host/
 resources/runtime/
 resources/harness/
 resources/build-identity.json
 resources/THIRD-PARTY-NOTICES.txt
+resources/generated-icons/
+release-assets/
 
 # Local Harness data used by development and tests
 .dsh/

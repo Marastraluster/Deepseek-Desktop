@@ -1,19 +1,27 @@
 {
   "name": "deepseek-desktop",
   "version": "0.1.0",
+  "description": "DeepSeek Harness desktop client",
+  "author": "Astraluster",
+  "repository": "https://github.com/Marastraluster/Deepseek-Desktop",
   "private": true,
   "type": "module",
+  "main": "apps/desktop-main/dist/main/main.js",
   "packageManager": "pnpm@11.19.0",
   "engines": {
     "node": ">=24.0.0 <25"
   },
   "scripts": {
     "harness:prepare": "node scripts/prepare-harness.mjs",
-    "dev": "electron-vite dev",
+    "dev": "pnpm --filter @deepseek-desktop/host build && pnpm --filter @deepseek-desktop/connection build && pnpm --filter @deepseek-desktop/renderer prepare:plugins && electron-vite dev",
+    "build": "pnpm --filter @deepseek-desktop/host build && pnpm --filter @deepseek-desktop/connection build && pnpm --filter @deepseek-desktop/renderer prepare:plugins && electron-vite build",
+    "prepare:release": "node scripts/package-release.mjs --stage-only",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "dist:win": "electron-builder --config electron-builder.yml --win",
-    "dist:portable": "electron-builder --config electron-builder.yml --win portable"
+    "dist:win": "node scripts/package-release.mjs --win nsis portable",
+    "dist:portable": "node scripts/package-release.mjs --win portable",
+    "dist:mac": "node scripts/package-release.mjs --mac dmg zip",
+    "dist:linux": "node scripts/package-release.mjs --linux AppImage"
   },
   "dependencies": {
     "@deepseek-ai/cordis": "workspace:*",
@@ -26,6 +34,7 @@
     "@types/node": "^24.0.0",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.7.0",
     "electron": "^40.0.0",
     "electron-builder": "^26.0.0",
     "electron-vite": "^4.0.0",
@@ -33,6 +42,7 @@
     "react-dom": "^18.3.1",
     "tsx": "^4.22.0",
     "typescript": "^6.0.3",
+    "vite": "^6.1.0",
     "vitest": "^4.1.0",
     "zod": "^4.4.3"
   }
