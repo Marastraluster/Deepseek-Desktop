@@ -24,6 +24,10 @@ export function resolveNodeRuntimeArchive(platform = process.platform, arch = pr
   return `node-v24.18.0-${distributionPlatform}-${arch}.${extension}`
 }
 
+export function resolveArchiveExtractor(platform = process.platform) {
+  return platform === 'win32' ? 'tar.exe' : 'tar'
+}
+
 export async function prepareNodeRuntime() {
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
   const archiveName = resolveNodeRuntimeArchive()
@@ -44,7 +48,7 @@ export async function prepareNodeRuntime() {
 
   const extractDirectory = mkdtempSync(join(tmpdir(), 'deepseek-node-'))
   try {
-    execFileSync('tar.exe', ['-xf', archive, '-C', extractDirectory], { stdio: 'inherit' })
+    execFileSync(resolveArchiveExtractor(), ['-xf', archive, '-C', extractDirectory], { stdio: 'inherit' })
     const rootName = archiveName.replace(/\.(zip|tar\.gz|tar\.xz)$/, '')
     const extracted = readdirSync(extractDirectory, { withFileTypes: true })
       .find(entry => entry.isDirectory() && entry.name === rootName)
