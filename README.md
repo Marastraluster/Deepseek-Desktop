@@ -41,8 +41,9 @@ DeepSeek Desktop 是一个面向本地开发工作的 Electron 客户端。它�
 下载与你的平台匹配的安装包：
 
 - Windows x64：NSIS 安装程序和便携版 EXE。
-- macOS x64 / arm64：DMG 和 ZIP。当前版本未签名、未公证，首次启动需要在 Finder
-  中使用“打开”。
+- macOS Apple Silicon（arm64）：DMG 和 ZIP。当前版本未签名、未公证，首次启动需要
+  在 Finder 中使用“打开”。Intel Mac 暂不提供预编译包，请从源码运行 `pnpm dist:mac`
+  构建。
 - Linux x64：AppImage。下载后先赋予可执行权限。
 
 Windows 构建使用 `CN=Astraluster` 自签名证书。每个 Release 附带

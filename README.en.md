@@ -45,8 +45,9 @@ Download the package for your platform from
 [GitHub Releases](https://github.com/Marastraluster/Deepseek-Desktop/releases):
 
 - Windows x64: NSIS installer and portable EXE.
-- macOS x64 / arm64: DMG and ZIP. Current builds are unsigned and unnotarized;
-  use Finder's Open action for the first launch.
+- macOS Apple Silicon (arm64): DMG and ZIP. Current builds are unsigned and
+  unnotarized; use Finder's Open action for the first launch. Intel Mac does
+  not currently have a prebuilt package; build it from source with `pnpm dist:mac`.
 - Linux x64: AppImage. Mark the downloaded file executable before launching.
 
 Windows builds use a `CN=Astraluster` self-signed certificate. Each release
