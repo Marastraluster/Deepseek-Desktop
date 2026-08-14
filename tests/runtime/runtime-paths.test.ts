@@ -1,4 +1,4 @@
-import { join } from 'node:path'
+import { posix, win32 } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { resolveRuntimePaths } from '../../apps/desktop-main/src/runtime/runtime-paths.ts'
 
@@ -11,8 +11,8 @@ describe('runtime paths', () => {
       nodeExecutable: 'C:\\Windows\\node.exe',
       platform: 'win32',
     })).toEqual({
-      nodeExecutable: join('C:\\Program Files\\DeepSeek Desktop\\resources', 'node', 'node.exe'),
-      hostEntry: join('C:\\Program Files\\DeepSeek Desktop\\resources', 'host', 'dist', 'main.js'),
+      nodeExecutable: win32.join('C:\\Program Files\\DeepSeek Desktop\\resources', 'node', 'node.exe'),
+      hostEntry: win32.join('C:\\Program Files\\DeepSeek Desktop\\resources', 'host', 'dist', 'main.js'),
     })
   })
 
@@ -25,7 +25,7 @@ describe('runtime paths', () => {
       platform: 'win32',
     })).toEqual({
       nodeExecutable: 'C:\\node24\\node.exe',
-      hostEntry: join('D:\\ProgramFiles\\Deepseek', 'apps', 'desktop-host', 'dist', 'main.js'),
+      hostEntry: win32.join('D:\\ProgramFiles\\Deepseek', 'apps', 'desktop-host', 'dist', 'main.js'),
     })
   })
 
@@ -38,8 +38,8 @@ describe('runtime paths', () => {
         nodeExecutable: '/usr/local/bin/node',
         platform,
       })).toEqual({
-        nodeExecutable: '/Applications/DeepSeek Desktop.app/Contents/Resources/node/bin/node',
-        hostEntry: '/Applications/DeepSeek Desktop.app/Contents/Resources/host/dist/main.js',
+        nodeExecutable: posix.join('/Applications/DeepSeek Desktop.app/Contents/Resources', 'node', 'bin', 'node'),
+        hostEntry: posix.join('/Applications/DeepSeek Desktop.app/Contents/Resources', 'host', 'dist', 'main.js'),
       })
     }
   })

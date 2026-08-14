@@ -1,3 +1,5 @@
+import { join, resolve } from 'node:path'
+import { pathToFileURL } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import {
   createWindowOptions,
@@ -16,9 +18,10 @@ describe('Electron security policy', () => {
   })
 
   it('allows app content, externalizes HTTPS, and denies other schemes', () => {
-    expect(resolveExternalNavigation('file:///D:/app/index.html')).toBe('allow')
+    const appRoot = resolve('tmp', 'deepseek-app')
+    expect(resolveExternalNavigation(pathToFileURL(join(appRoot, 'index.html')).href, appRoot)).toBe('allow')
     expect(resolveExternalNavigation('https://github.com/deepseek-ai')).toBe('external')
     expect(resolveExternalNavigation('javascript:alert(1)')).toBe('deny')
-    expect(resolveExternalNavigation('file:///C:/Windows/System32/cmd.exe')).toBe('deny')
+    expect(resolveExternalNavigation(pathToFileURL(resolve('tmp', 'other-app', 'index.html')).href, appRoot)).toBe('deny')
   })
 })

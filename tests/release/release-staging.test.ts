@@ -65,5 +65,6 @@ describe('release staging', () => {
     expect(signer).toMatch(/CN=Astraluster/)
     expect(workflow).toMatch(/refs\/tags\/v/)
     expect(workflow).toMatch(/actions\/upload-artifact/)
+    expect(workflow).toMatch(/pnpm harness:prepare\s*\n\s*- run: pnpm install --frozen-lockfile\s*\n\s*- run: pnpm build\s*\n\s*- run: pnpm test/)
   })
 })

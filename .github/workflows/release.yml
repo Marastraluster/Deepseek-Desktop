@@ -29,6 +29,8 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm harness:prepare
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
       - run: pnpm test
 
   package:
@@ -63,6 +65,8 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm harness:prepare
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
       - run: pnpm test
       - run: ${{ matrix.command }}
       - if: runner.os == 'Windows'
