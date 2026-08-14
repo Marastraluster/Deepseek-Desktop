@@ -1,0 +1,19 @@
+.superpowers/
+.cache/
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+out/
+coverage/
+*.log
+
+# Generated desktop runtime and installer inputs
+resources/runtime/
+resources/harness/
+
+# Local Harness data used by development and tests
+.dsh/
+.dsh-test/
+
