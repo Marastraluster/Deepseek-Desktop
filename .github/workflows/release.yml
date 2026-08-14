@@ -27,7 +27,6 @@ jobs:
         with:
           node-version: 24.18.0
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
       - run: pnpm harness:prepare
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
@@ -63,7 +62,6 @@ jobs:
         with:
           node-version: 24.18.0
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
       - run: pnpm harness:prepare
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
