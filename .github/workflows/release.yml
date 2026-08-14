@@ -66,6 +66,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
       - run: pnpm test
+      - if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install --yes imagemagick
       - run: ${{ matrix.command }}
       - if: runner.os == 'Windows'
         shell: pwsh
