@@ -9,7 +9,6 @@ packages:
   - vendor/deepseek-harness/apps/*
 
 linkWorkspacePackages: true
-injectWorkspacePackages: true
 
 overrides:
   '@deepseek-ai/cosmokit': 'link:vendor/deepseek-harness/vendor/cosmokit'

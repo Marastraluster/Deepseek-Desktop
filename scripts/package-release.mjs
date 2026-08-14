@@ -19,7 +19,7 @@ export async function stageReleaseInputs() {
 function stageHost() {
   const target = join(resources, 'host')
   rmSync(target, { recursive: true, force: true })
-  runPnpm(['--ignore-scripts', '--filter', '@deepseek-desktop/host', 'deploy', '--prod', target])
+  runPnpm(['--ignore-scripts', '--filter', '@deepseek-desktop/host', 'deploy', '--legacy', '--prod', target])
 
   const harnessRoot = join(target, 'vendor', 'deepseek-harness')
   copyFile(join(root, 'vendor', 'deepseek-harness', 'packages', 'bundle', 'base', 'cordis.patch.yml'), join(harnessRoot, 'packages', 'bundle', 'base', 'cordis.patch.yml'))

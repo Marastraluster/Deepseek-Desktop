@@ -44,13 +44,13 @@ describe('release staging', () => {
     expect(pkg.scripts['dist:mac']).toBe('node scripts/package-release.mjs --mac dmg zip')
     expect(pkg.scripts['dist:linux']).toBe('node scripts/package-release.mjs --linux AppImage')
     expect(existsSync(join(root, 'resources', 'icons', 'DeepSeek_AppleStyle.ico'))).toBe(true)
-    expect(workspace).toMatch(/injectWorkspacePackages:\s*true/)
+    expect(workspace).not.toMatch(/injectWorkspacePackages:/)
     expect(workspace).toMatch(/'@deepseek-ai\/dsh-subprocess-local':\s*true/)
     expect(workspace).toMatch(/'@deepseek-ai\/dsh-subprocess-local@file:vendor\/deepseek-harness\/packages\/subprocess\/subprocess-local':\s*true/)
     expect(workspace).not.toMatch(/file:\/\/\/[A-Za-z]:\//)
 
     const stagingScript = readFileSync(join(root, 'scripts', 'package-release.mjs'), 'utf8')
-    expect(stagingScript).toMatch(/\['--ignore-scripts', '--filter', '@deepseek-desktop\/host', 'deploy'/)
+    expect(stagingScript).toMatch(/\['--ignore-scripts', '--filter', '@deepseek-desktop\/host', 'deploy', '--legacy'/)
   })
 
   it('defines tag-triggered native release builds with Astraluster signing', () => {
