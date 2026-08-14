@@ -1,0 +1,28 @@
+packages:
+  - apps/*
+  - packages/*
+  - vendor/deepseek-harness
+  - vendor/deepseek-harness/vendor/*
+  - vendor/deepseek-harness/packages/*/*
+  - vendor/deepseek-harness/native/landlock-run
+  - vendor/deepseek-harness/native/landlock-run/packages/*
+  - vendor/deepseek-harness/apps/*
+
+linkWorkspacePackages: true
+
+overrides:
+  '@deepseek-ai/cosmokit': 'link:vendor/deepseek-harness/vendor/cosmokit'
+  '@deepseek-ai/schemastery': 'link:vendor/deepseek-harness/vendor/schemastery'
+
+allowBuilds:
+  esbuild: true
+  electron: true
+  lefthook: false
+  node-pty: true
+  koffi: true
+  '@google/genai': false
+  protobufjs: false
+  node-addon-require-builtin: false
+
+patchedDependencies:
+  node-pty@1.1.0: vendor/deepseek-harness/patches/node-pty@1.1.0.patch

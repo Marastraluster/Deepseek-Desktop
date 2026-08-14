@@ -1,0 +1,31 @@
+appId: ai.deepseek.desktop
+productName: DeepSeek Desktop
+directories:
+  output: dist
+  buildResources: build
+files:
+  - apps/desktop-main/dist/**
+  - apps/desktop-renderer/dist/**
+  - packages/**/dist/**
+  - package.json
+extraResources:
+  - from: resources/node
+    to: node
+  - from: resources/host
+    to: host
+  - from: resources/THIRD-PARTY-NOTICES.txt
+    to: THIRD-PARTY-NOTICES.txt
+  - from: resources/build-identity.json
+    to: build-identity.json
+asar: true
+win:
+  target:
+    - nsis
+    - portable
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  deleteAppDataOnUninstall: false
+portable:
+  artifactName: DeepSeek-Desktop-Portable-${version}.${ext}

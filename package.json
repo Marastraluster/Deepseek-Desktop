@@ -1,0 +1,39 @@
+{
+  "name": "deepseek-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.19.0",
+  "engines": {
+    "node": ">=24.0.0 <25"
+  },
+  "scripts": {
+    "harness:prepare": "node scripts/prepare-harness.mjs",
+    "dev": "electron-vite dev",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "dist:win": "electron-builder --config electron-builder.yml --win",
+    "dist:portable": "electron-builder --config electron-builder.yml --win portable"
+  },
+  "dependencies": {
+    "@deepseek-ai/cordis": "workspace:*",
+    "@deepseek-ai/dsh-client-connection": "workspace:*",
+    "@deepseek-ai/dsh-client-web": "workspace:*",
+    "@deepseek-ai/dsh-host-apiproxy": "workspace:*"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^24.0.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "electron": "^40.0.0",
+    "electron-builder": "^26.0.0",
+    "electron-vite": "^4.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tsx": "^4.22.0",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.0",
+    "zod": "^4.4.3"
+  }
+}

@@ -1,4 +1,9 @@
 .superpowers/
+node_modules/
+dist/
+vendor/deepseek-harness/node_modules/
+vendor/deepseek-harness/packages/*/lib/
+vendor/deepseek-harness/apps/*/lib/
 .cache/
 .env
 .env.*
@@ -10,10 +15,13 @@ coverage/
 *.log
 
 # Generated desktop runtime and installer inputs
+resources/node/
+resources/host/
 resources/runtime/
 resources/harness/
+resources/build-identity.json
+resources/THIRD-PARTY-NOTICES.txt
 
 # Local Harness data used by development and tests
 .dsh/
 .dsh-test/
-
