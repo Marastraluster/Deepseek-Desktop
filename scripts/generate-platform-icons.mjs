@@ -29,14 +29,18 @@ function generateMacIcons(source) {
   const iconset = join(output, 'icon.iconset')
   mkdirSync(iconset)
   for (const size of [16, 32, 128, 256, 512]) {
-    writeMacPng(size, join(iconset, `icon_${size}x${size}.png`))
-    writeMacPng(size * 2, join(iconset, `icon_${size}x${size}@2x.png`))
+    writeMacPng(source, size, join(iconset, `icon_${size}x${size}.png`))
+    writeMacPng(source, size * 2, join(iconset, `icon_${size}x${size}@2x.png`))
   }
   execFileSync('iconutil', ['-c', 'icns', iconset, '-o', join(output, 'icon.icns')], { stdio: 'inherit' })
 }
 
-function writeMacPng(size, destination) {
-  execFileSync('sips', ['-z', String(size), String(size), source, '--out', destination], { stdio: 'inherit' })
+export function createMacIconArguments(source, size, destination) {
+  return ['-z', String(size), String(size), source, '--out', destination]
+}
+
+function writeMacPng(source, size, destination) {
+  execFileSync('sips', createMacIconArguments(source, size, destination), { stdio: 'inherit' })
 }
 
 function generateLinuxIcons(source) {
