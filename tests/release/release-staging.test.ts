@@ -126,7 +126,9 @@ describe('release staging', () => {
     expect(workspace).not.toMatch(/file:\/\/\/[A-Za-z]:\//)
 
     const stagingScript = readFileSync(join(root, 'scripts', 'package-release.mjs'), 'utf8')
+    const builderConfig = readFileSync(join(root, 'electron-builder.yml'), 'utf8')
     expect(stagingScript).toMatch(/\['--ignore-scripts', '--config\.inject-workspace-packages=true', '--config\.node-linker=hoisted', '--filter', '@deepseek-desktop\/host', 'deploy', '--prod'/)
+    expect(builderConfig).toMatch(/from: resources\/icons\/DeepSeek_AppleStyle\.png\s*\n\s*to: tray-icon\.png/)
   })
 
   it('defines tag-triggered native release builds with Astraluster signing', () => {
@@ -134,14 +136,14 @@ describe('release staging', () => {
     const signer = readFileSync(join(root, 'scripts', 'sign-windows-artifacts.ps1'), 'utf8')
 
     expect(workflow).toMatch(/windows-latest/)
-    expect(workflow).toMatch(/macos-13/)
+    expect(workflow).not.toMatch(/macos-13/)
     expect(workflow).toMatch(/macos-14/)
     expect(workflow).toMatch(/ubuntu-latest/)
     expect(workflow).toMatch(/sign-windows-artifacts\.ps1/)
     expect(signer).toMatch(/CN=Astraluster/)
     expect(workflow).toMatch(/refs\/tags\/v/)
     expect(workflow).toMatch(/actions\/upload-artifact/)
-    expect(workflow).not.toMatch(/pnpm install --frozen-lockfile(?: --force)?\s*\n\s*- run: pnpm harness:prepare/)
-    expect(workflow).toMatch(/pnpm harness:prepare\s*\n\s*- run: pnpm install --frozen-lockfile\s*\n\s*- run: pnpm build\s*\n\s*- run: pnpm test/)
+    expect(workflow).toMatch(/pnpm install --frozen-lockfile\s*\n\s*- run: pnpm harness:prepare\s*\n\s*- run: pnpm build\s*\n\s*- run: pnpm test/)
+    expect(workflow).toMatch(/cancel-in-progress: \$\{\{ !startsWith\(github\.ref, 'refs\/tags\/v'\) \}\}/)
   })
 })
