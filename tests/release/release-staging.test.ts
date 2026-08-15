@@ -128,6 +128,7 @@ describe('release staging', () => {
     const stagingScript = readFileSync(join(root, 'scripts', 'package-release.mjs'), 'utf8')
     const builderConfig = readFileSync(join(root, 'electron-builder.yml'), 'utf8')
     expect(stagingScript).toMatch(/\['--ignore-scripts', '--config\.inject-workspace-packages=true', '--config\.node-linker=hoisted', '--filter', '@deepseek-desktop\/host', 'deploy', '--prod'/)
+    expect(stagingScript).toMatch(/copyDirectory\(join\(root, 'vendor', 'deepseek-harness', 'packages', 'host', 'apiproxy'\), join\(target, 'node_modules', '@deepseek-ai', 'dsh-host-apiproxy'\)\)/)
     expect(builderConfig).toMatch(/from: resources\/icons\/DeepSeek_AppleStyle\.png\s*\n\s*to: tray-icon\.png/)
   })
 

@@ -1,5 +1,5 @@
 import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs'
-import { dirname, join, relative, resolve } from 'node:path'
+import { basename, dirname, join, relative, resolve } from 'node:path'
 import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { generatePlatformIcons } from './generate-platform-icons.mjs'
@@ -21,6 +21,7 @@ function stageHost() {
   rmSync(target, { recursive: true, force: true })
   runPnpm(['--ignore-scripts', '--config.inject-workspace-packages=true', '--config.node-linker=hoisted', '--filter', '@deepseek-desktop/host', 'deploy', '--prod', target])
 
+  copyDirectory(join(root, 'vendor', 'deepseek-harness', 'packages', 'host', 'apiproxy'), join(target, 'node_modules', '@deepseek-ai', 'dsh-host-apiproxy'))
   const harnessRoot = join(target, 'vendor', 'deepseek-harness')
   copyFile(join(root, 'vendor', 'deepseek-harness', 'packages', 'bundle', 'base', 'cordis.patch.yml'), join(harnessRoot, 'packages', 'bundle', 'base', 'cordis.patch.yml'))
   copyFile(join(root, 'vendor', 'deepseek-harness', 'packages', 'bundle', 'web-app', 'cordis.patch.yml'), join(harnessRoot, 'packages', 'bundle', 'web-app', 'cordis.patch.yml'))
@@ -54,8 +55,12 @@ function copyFile(source, target) {
 }
 
 function copyDirectory(source, target) {
+  rmSync(target, { recursive: true, force: true })
   mkdirSync(dirname(target), { recursive: true })
-  cpSync(source, target, { recursive: true })
+  cpSync(source, target, {
+    recursive: true,
+    filter: (path) => !['.cache', 'node_modules'].includes(basename(path)),
+  })
 }
 
 function assertInternalSymlinks(directory, root = directory) {
