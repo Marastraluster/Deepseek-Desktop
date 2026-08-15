@@ -10,4 +10,13 @@ describe('background mode lifecycle', () => {
     expect(window.hide).toHaveBeenCalledOnce()
     expect(shouldKeepProcessAlive(false)).toBe(true)
   })
+
+  it('allows an explicit quit and stops keeping the process alive', () => {
+    const event = { preventDefault: vi.fn() }
+    const window = { hide: vi.fn(), isMinimized: () => false, restore: vi.fn(), show: vi.fn(), focus: vi.fn() }
+    expect(hideWindowOnClose(event, window, true)).toBe(false)
+    expect(event.preventDefault).not.toHaveBeenCalled()
+    expect(window.hide).not.toHaveBeenCalled()
+    expect(shouldKeepProcessAlive(true)).toBe(false)
+  })
 })
