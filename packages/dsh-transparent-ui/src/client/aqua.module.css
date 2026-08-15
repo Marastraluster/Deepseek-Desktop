@@ -423,7 +423,7 @@
    geometry-neutral. Put the floating card inset on the sidebar root instead:
    this preserves the grid track while letting the root retain its stock
    freeze-and-clip collapse animation. ---------- */
-[data-dsh-float] [class*='sidebarCol'] {
+[data-dsh-float] [data-dsh-frame] > [class*='sidebarCol'] {
   margin: 0;
   padding: 0;
   border: none;
@@ -457,7 +457,7 @@
 }
 
 /* Collapsed rail: full-height glass strip with the stock 56px track intact. */
-[data-dsh-float] [data-dsh-frame][data-sidebar-collapsed] [class*='sidebarCol'] {
+[data-dsh-float] [data-dsh-frame][data-sidebar-collapsed] > [class*='sidebarCol'] {
   margin: 0;
   padding: 0;
   border: 1px solid rgba(19, 45, 83, 0.26);
@@ -470,7 +470,7 @@
     0 8px 28px rgba(19, 45, 83, 0.1);
 }
 
-[data-dsh-float] body[data-ds-dark-theme] [data-dsh-frame][data-sidebar-collapsed] [class*='sidebarCol'] {
+[data-dsh-float] body[data-ds-dark-theme] [data-dsh-frame][data-sidebar-collapsed] > [class*='sidebarCol'] {
   border-color: rgba(148, 180, 220, 0.32);
   border-right-color: rgba(148, 180, 220, 0.2);
   background: var(--dsh-aqua-glass-card-dark);
@@ -709,7 +709,7 @@
   animation: none;
 }
 
-[data-dsh-aqua][data-dsh-compat] [class*='sidebarCol'] {
+[data-dsh-aqua][data-dsh-compat] [data-dsh-frame] > [class*='sidebarCol'] {
   backdrop-filter: blur(24px) saturate(140%);
 }
 
