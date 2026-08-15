@@ -73,12 +73,15 @@ describe('release staging', () => {
     temporaryDirectories.push(output)
     const verifier = require(verificationScript) as {
       materializeApiProxyPackage: (appOutDir: string) => void
+      materializeAgentPresets: (appOutDir: string) => void
     }
 
     verifier.materializeApiProxyPackage(output)
+    verifier.materializeAgentPresets(output)
 
     expect(existsSync(join(output, 'resources', 'host', 'node_modules', '@deepseek-ai', 'dsh-host-apiproxy', 'package.json'))).toBe(true)
     expect(existsSync(join(output, 'resources', 'host', 'node_modules', '@deepseek-ai', 'dsh-host-apiproxy', '.cache'))).toBe(false)
+    expect(existsSync(join(output, 'resources', 'host', 'vendor', 'deepseek-harness', 'apps', 'cli', 'config', 'agent-presets'))).toBe(true)
   })
 
   it('rejects a packaged Host without its shipped agent presets', () => {

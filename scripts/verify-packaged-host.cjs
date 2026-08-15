@@ -3,6 +3,7 @@ const { basename, dirname, join, resolve } = require('node:path')
 
 const API_PROXY_PACKAGE = '@deepseek-ai/dsh-host-apiproxy'
 const API_PROXY_SOURCE = join(__dirname, '..', 'vendor', 'deepseek-harness', 'packages', 'host', 'apiproxy')
+const AGENT_PRESETS_SOURCE = join(__dirname, '..', 'vendor', 'deepseek-harness', 'apps', 'cli', 'config', 'agent-presets')
 
 function materializeApiProxyPackage(appOutDir) {
   const target = join(
@@ -23,6 +24,31 @@ function materializeApiProxyPackage(appOutDir) {
   cpSync(API_PROXY_SOURCE, target, {
     recursive: true,
     filter: (path) => !['.cache', 'node_modules'].includes(basename(path)),
+  })
+}
+
+function materializeAgentPresets(appOutDir) {
+  const target = join(
+    resolve(appOutDir),
+    'resources',
+    'host',
+    'vendor',
+    'deepseek-harness',
+    'apps',
+    'cli',
+    'config',
+    'agent-presets',
+  )
+
+  if (!existsSync(AGENT_PRESETS_SOURCE)) {
+    throw new Error(`release source is missing shipped agent presets: ${AGENT_PRESETS_SOURCE}`)
+  }
+
+  rmSync(target, { recursive: true, force: true })
+  mkdirSync(dirname(target), { recursive: true })
+  cpSync(AGENT_PRESETS_SOURCE, target, {
+    recursive: true,
+    filter: (path) => basename(path) !== '.cache',
   })
 }
 
@@ -48,12 +74,14 @@ function assertPackagedHostRuntime(appOutDir) {
 
 async function verifyPackagedHost(context) {
   materializeApiProxyPackage(context.appOutDir)
+  materializeAgentPresets(context.appOutDir)
   assertPackagedHostRuntime(context.appOutDir)
 }
 
 module.exports = verifyPackagedHost
 module.exports.assertPackagedHostRuntime = assertPackagedHostRuntime
 module.exports.materializeApiProxyPackage = materializeApiProxyPackage
+module.exports.materializeAgentPresets = materializeAgentPresets
 
 if (require.main === module) {
   try {
