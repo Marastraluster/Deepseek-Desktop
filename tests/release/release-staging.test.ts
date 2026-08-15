@@ -1,10 +1,86 @@
-import { existsSync, readFileSync } from 'node:fs'
-import { join } from 'node:path'
-import { describe, expect, it } from 'vitest'
+import { spawnSync } from 'node:child_process'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { tmpdir } from 'node:os'
+import { afterEach, describe, expect, it } from 'vitest'
 
 const root = join(import.meta.dirname, '..', '..')
+const verificationScript = join(root, 'scripts', 'verify-packaged-host.cjs')
+const temporaryDirectories: string[] = []
+
+afterEach(() => {
+  for (const directory of temporaryDirectories.splice(0)) rmSync(directory, { recursive: true, force: true })
+})
 
 describe('release staging', () => {
+  it('declares Harness peer dependencies required by the packaged Host', () => {
+    const host = JSON.parse(readFileSync(join(root, 'apps', 'desktop-host', 'package.json'), 'utf8')) as {
+      dependencies: Record<string, string>
+    }
+
+    for (const name of [
+      '@deepseek-ai/dsh-anonymous-user-id',
+      '@deepseek-ai/dsh-atomic-write',
+      '@deepseek-ai/dsh-bash-local',
+      '@deepseek-ai/dsh-code-runtime',
+      '@deepseek-ai/dsh-compaction',
+      '@deepseek-ai/dsh-fs',
+      '@deepseek-ai/dsh-home-paths',
+      '@deepseek-ai/dsh-invariants',
+      '@deepseek-ai/dsh-launch-environment',
+      '@deepseek-ai/dsh-output-retention',
+      '@deepseek-ai/dsh-pwsh-local',
+      '@deepseek-ai/dsh-sandbox',
+      '@deepseek-ai/dsh-scope',
+      '@deepseek-ai/dsh-session-telemetry',
+      '@deepseek-ai/dsh-session-title-llm',
+      '@deepseek-ai/dsh-shell',
+      '@deepseek-ai/dsh-spill',
+      '@deepseek-ai/dsh-subagent-in-process-driver',
+      '@deepseek-ai/dsh-subprocess',
+      '@deepseek-ai/dsh-timeout',
+      '@deepseek-ai/dsh-workflow',
+    ]) {
+      expect(host.dependencies[name]).toBe('workspace:*')
+    }
+  })
+
+  it('rejects a packaged Host without its API proxy runtime dependency', () => {
+    const output = mkdtempSync(join(tmpdir(), 'deepseek-desktop-package-'))
+    temporaryDirectories.push(output)
+
+    const result = spawnSync(process.execPath, [verificationScript, output], { encoding: 'utf8' })
+
+    expect(result.status).toBe(1)
+    expect(result.stderr).toContain('packaged Host is missing @deepseek-ai/dsh-host-apiproxy')
+  })
+
+  it('accepts a packaged Host with its API proxy runtime dependency', () => {
+    const output = mkdtempSync(join(tmpdir(), 'deepseek-desktop-package-'))
+    temporaryDirectories.push(output)
+    const packageJson = join(output, 'resources', 'host', 'node_modules', '@deepseek-ai', 'dsh-host-apiproxy', 'package.json')
+    mkdirSync(dirname(packageJson), { recursive: true })
+    writeFileSync(packageJson, '{"name":"@deepseek-ai/dsh-host-apiproxy"}')
+    mkdirSync(join(output, 'resources', 'host', 'vendor', 'deepseek-harness', 'apps', 'cli', 'config', 'agent-presets'), { recursive: true })
+
+    const result = spawnSync(process.execPath, [verificationScript, output], { encoding: 'utf8' })
+
+    expect(result.status).toBe(0)
+  })
+
+  it('rejects a packaged Host without its shipped agent presets', () => {
+    const output = mkdtempSync(join(tmpdir(), 'deepseek-desktop-package-'))
+    temporaryDirectories.push(output)
+    const packageJson = join(output, 'resources', 'host', 'node_modules', '@deepseek-ai', 'dsh-host-apiproxy', 'package.json')
+    mkdirSync(dirname(packageJson), { recursive: true })
+    writeFileSync(packageJson, '{"name":"@deepseek-ai/dsh-host-apiproxy"}')
+
+    const result = spawnSync(process.execPath, [verificationScript, output], { encoding: 'utf8' })
+
+    expect(result.status).toBe(1)
+    expect(result.stderr).toContain('packaged Host is missing shipped agent presets')
+  })
+
   it('pins a checksummed Node 24 runtime for every released platform', () => {
     const manifestPath = join(root, 'resources', 'node', 'checksums.json')
     expect(existsSync(manifestPath)).toBe(true)
@@ -50,7 +126,7 @@ describe('release staging', () => {
     expect(workspace).not.toMatch(/file:\/\/\/[A-Za-z]:\//)
 
     const stagingScript = readFileSync(join(root, 'scripts', 'package-release.mjs'), 'utf8')
-    expect(stagingScript).toMatch(/\['--ignore-scripts', '--filter', '@deepseek-desktop\/host', 'deploy', '--legacy'/)
+    expect(stagingScript).toMatch(/\['--ignore-scripts', '--config\.inject-workspace-packages=true', '--config\.node-linker=hoisted', '--filter', '@deepseek-desktop\/host', 'deploy', '--prod'/)
   })
 
   it('defines tag-triggered native release builds with Astraluster signing', () => {

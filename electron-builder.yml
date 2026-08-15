@@ -3,6 +3,7 @@ productName: DeepSeek Desktop
 directories:
   output: dist
   buildResources: resources/generated-icons
+afterPack: ./scripts/verify-packaged-host.cjs
 files:
   - apps/desktop-main/dist/**
   - apps/desktop-renderer/dist/**
@@ -13,6 +14,12 @@ extraResources:
     to: node
   - from: resources/host
     to: host
+    filter:
+      - '**/*'
+  - from: resources/host/node_modules
+    to: host/node_modules
+    filter:
+      - '**/*'
   - from: resources/THIRD-PARTY-NOTICES.txt
     to: THIRD-PARTY-NOTICES.txt
   - from: resources/build-identity.json

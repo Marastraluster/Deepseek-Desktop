@@ -19,11 +19,12 @@ export async function stageReleaseInputs() {
 function stageHost() {
   const target = join(resources, 'host')
   rmSync(target, { recursive: true, force: true })
-  runPnpm(['--ignore-scripts', '--filter', '@deepseek-desktop/host', 'deploy', '--legacy', '--prod', target])
+  runPnpm(['--ignore-scripts', '--config.inject-workspace-packages=true', '--config.node-linker=hoisted', '--filter', '@deepseek-desktop/host', 'deploy', '--prod', target])
 
   const harnessRoot = join(target, 'vendor', 'deepseek-harness')
   copyFile(join(root, 'vendor', 'deepseek-harness', 'packages', 'bundle', 'base', 'cordis.patch.yml'), join(harnessRoot, 'packages', 'bundle', 'base', 'cordis.patch.yml'))
   copyFile(join(root, 'vendor', 'deepseek-harness', 'packages', 'bundle', 'web-app', 'cordis.patch.yml'), join(harnessRoot, 'packages', 'bundle', 'web-app', 'cordis.patch.yml'))
+  copyDirectory(join(root, 'vendor', 'deepseek-harness', 'apps', 'cli', 'config', 'agent-presets'), join(harnessRoot, 'apps', 'cli', 'config', 'agent-presets'))
   if (!existsSync(join(target, 'dist', 'main.js'))) throw new Error('deployed desktop Host is missing dist/main.js')
   materializeExternalSymlinks(target)
   assertInternalSymlinks(target)
@@ -50,6 +51,11 @@ function stageNotices() {
 function copyFile(source, target) {
   mkdirSync(dirname(target), { recursive: true })
   cpSync(source, target)
+}
+
+function copyDirectory(source, target) {
+  mkdirSync(dirname(target), { recursive: true })
+  cpSync(source, target, { recursive: true })
 }
 
 function assertInternalSymlinks(directory, root = directory) {
