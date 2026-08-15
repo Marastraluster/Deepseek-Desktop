@@ -1,7 +1,8 @@
 import { readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
-import { app, BrowserWindow, ipcMain, shell } from 'electron'
+import { app, BrowserWindow, ipcMain, Menu, nativeImage, shell, Tray } from 'electron'
 import { registerMainRouter } from './ipc/main-router.ts'
+import { hideWindowOnClose, shouldKeepProcessAlive, showWindow } from './lifecycle/background-mode.ts'
 import { resolveRuntimePaths } from './runtime/runtime-paths.ts'
 import { RuntimeSupervisor } from './runtime/runtime-supervisor.ts'
 import { createWindowOptions, resolveExternalNavigation } from './security/navigation-policy.ts'
@@ -9,6 +10,8 @@ import { createWindowOptions, resolveExternalNavigation } from './security/navig
 const PROTOCOL_VERSION = '1'
 let runtime: RuntimeSupervisor | undefined
 let mainWindow: BrowserWindow | undefined
+let tray: Tray | undefined
+let explicitQuit = false
 
 app.setName('DeepSeek Desktop')
 
@@ -16,9 +19,7 @@ if (!app.requestSingleInstanceLock()) {
   app.quit()
 } else {
   app.on('second-instance', () => {
-    if (mainWindow === undefined) return
-    if (mainWindow.isMinimized()) mainWindow.restore()
-    mainWindow.focus()
+    showWindow(mainWindow)
   })
   app.whenReady().then(startDesktop).catch((error: unknown) => {
     console.error('[desktop-main] startup failed:', error)
@@ -27,6 +28,9 @@ if (!app.requestSingleInstanceLock()) {
 }
 
 app.on('before-quit', (event) => {
+  explicitQuit = true
+  tray?.destroy()
+  tray = undefined
   if (runtime === undefined || runtime.status().state === 'stopped') return
   event.preventDefault()
   const active = runtime
@@ -34,10 +38,30 @@ app.on('before-quit', (event) => {
   void active.stop().finally(() => app.quit())
 })
 
-app.on('window-all-closed', () => app.quit())
+app.on('window-all-closed', () => {
+  if (shouldKeepProcessAlive(explicitQuit)) return
+  app.quit()
+})
 
 async function startDesktop(): Promise<void> {
   const appRoot = app.getAppPath()
+  const trayIconPath = app.isPackaged
+    ? join(process.resourcesPath, 'tray-icon.png')
+    : join(appRoot, 'resources', 'icons', 'DeepSeek_AppleStyle.png')
+  tray = new Tray(nativeImage.createFromPath(trayIconPath))
+  tray.setToolTip('DeepSeek Desktop')
+  tray.on('click', () => showWindow(mainWindow))
+  tray.setContextMenu(Menu.buildFromTemplate([
+    { label: 'Show DeepSeek Desktop', click: () => showWindow(mainWindow) },
+    { type: 'separator' },
+    {
+      label: 'Quit DeepSeek Desktop',
+      click: () => {
+        explicitQuit = true
+        app.quit()
+      },
+    },
+  ]))
   const identity = readBuildIdentity(appRoot)
   const nodeExecutable = app.isPackaged
     ? process.execPath
@@ -77,6 +101,9 @@ async function startDesktop(): Promise<void> {
   const rendererUrl = developmentUrl ?? new URL(`file:///${join(rendererRoot, 'index.html').replaceAll('\\', '/')}`).href
   installNavigationPolicy(window, rendererUrl, rendererRoot)
   window.once('ready-to-show', () => window.show())
+  window.on('close', (event) => {
+    hideWindowOnClose(event, window, explicitQuit)
+  })
   window.on('closed', () => {
     if (mainWindow === window) mainWindow = undefined
   })
