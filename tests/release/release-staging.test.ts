@@ -68,6 +68,19 @@ describe('release staging', () => {
     expect(result.status).toBe(0)
   })
 
+  it('materializes the API proxy into the final app output before verification', () => {
+    const output = mkdtempSync(join(tmpdir(), 'deepseek-desktop-package-'))
+    temporaryDirectories.push(output)
+    const verifier = require(verificationScript) as {
+      materializeApiProxyPackage: (appOutDir: string) => void
+    }
+
+    verifier.materializeApiProxyPackage(output)
+
+    expect(existsSync(join(output, 'resources', 'host', 'node_modules', '@deepseek-ai', 'dsh-host-apiproxy', 'package.json'))).toBe(true)
+    expect(existsSync(join(output, 'resources', 'host', 'node_modules', '@deepseek-ai', 'dsh-host-apiproxy', '.cache'))).toBe(false)
+  })
+
   it('rejects a packaged Host without its shipped agent presets', () => {
     const output = mkdtempSync(join(tmpdir(), 'deepseek-desktop-package-'))
     temporaryDirectories.push(output)
@@ -126,9 +139,12 @@ describe('release staging', () => {
     expect(workspace).not.toMatch(/file:\/\/\/[A-Za-z]:\//)
 
     const stagingScript = readFileSync(join(root, 'scripts', 'package-release.mjs'), 'utf8')
+    const afterPackScript = readFileSync(join(root, 'scripts', 'verify-packaged-host.cjs'), 'utf8')
     const builderConfig = readFileSync(join(root, 'electron-builder.yml'), 'utf8')
     expect(stagingScript).toMatch(/\['--ignore-scripts', '--config\.inject-workspace-packages=true', '--config\.node-linker=hoisted', '--filter', '@deepseek-desktop\/host', 'deploy', '--prod'/)
     expect(stagingScript).toMatch(/copyDirectory\(join\(root, 'vendor', 'deepseek-harness', 'packages', 'host', 'apiproxy'\), join\(target, 'node_modules', '@deepseek-ai', 'dsh-host-apiproxy'\)\)/)
+    expect(afterPackScript).toMatch(/context\.appOutDir/)
+    expect(afterPackScript).toMatch(/vendor.*deepseek-harness.*packages.*host.*apiproxy/)
     expect(builderConfig).toMatch(/from: resources\/icons\/DeepSeek_AppleStyle\.png\s*\n\s*to: tray-icon\.png/)
   })
 
