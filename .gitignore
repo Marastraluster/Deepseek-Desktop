@@ -20,6 +20,7 @@ apps/desktop-renderer/dist/
 apps/desktop-renderer/public/boot-manifest.json
 apps/desktop-renderer/public/plugins/
 packages/desktop-connection/lib/
+packages/dsh-transparent-ui/lib/
 
 # Generated desktop runtime and installer inputs
 resources/node/*
@@ -35,3 +36,5 @@ release-assets/
 # Local Harness data used by development and tests
 .dsh/
 .dsh-test/
+.dev-profile*/
+.local-profile*/

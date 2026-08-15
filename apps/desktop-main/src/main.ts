@@ -1,11 +1,14 @@
 import { readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
-import { app, BrowserWindow, ipcMain, Menu, nativeImage, shell, Tray } from 'electron'
+import { app, BrowserWindow, ipcMain, Menu, nativeImage, protocol, shell, Tray } from 'electron'
 import { registerMainRouter } from './ipc/main-router.ts'
 import { hideWindowOnClose, shouldKeepProcessAlive, showWindow } from './lifecycle/background-mode.ts'
 import { resolveRuntimePaths } from './runtime/runtime-paths.ts'
 import { RuntimeSupervisor } from './runtime/runtime-supervisor.ts'
 import { createWindowOptions, resolveExternalNavigation } from './security/navigation-policy.ts'
+import { registerAppearanceIpc, registerAppearanceProtocol } from './appearance/appearance-ipc.ts'
+import { migrateDevelopmentAppearance } from './appearance/development-appearance-migration.ts'
+import { configureDesktopProfile } from './runtime/development-profile.ts'
 
 const PROTOCOL_VERSION = '1'
 let runtime: RuntimeSupervisor | undefined
@@ -13,7 +16,8 @@ let mainWindow: BrowserWindow | undefined
 let tray: Tray | undefined
 let explicitQuit = false
 
-app.setName('DeepSeek Desktop')
+configureDesktopProfile(app)
+protocol.registerSchemesAsPrivileged([{ scheme: 'deepseek-appearance', privileges: { secure: true, standard: true, corsEnabled: true, supportFetchAPI: true, stream: true } }])
 
 if (!app.requestSingleInstanceLock()) {
   app.quit()
@@ -44,6 +48,10 @@ app.on('window-all-closed', () => {
 })
 
 async function startDesktop(): Promise<void> {
+  if (!app.isPackaged) {
+    await migrateDevelopmentAppearance(join(app.getPath('appData'), 'DeepSeek Desktop'), app.getPath('userData'))
+  }
+  registerAppearanceProtocol(app.getPath('userData'))
   const appRoot = app.getAppPath()
   const trayIconPath = app.isPackaged
     ? join(process.resourcesPath, 'tray-icon.png')
@@ -95,11 +103,56 @@ async function startDesktop(): Promise<void> {
     registrar: ipcMain,
     runtime,
   })
+  registerAppearanceIpc(window, app.getPath('userData'))
 
   const developmentUrl = process.env.ELECTRON_RENDERER_URL
   const rendererRoot = resolve(appRoot, 'apps', 'desktop-renderer', 'dist')
   const rendererUrl = developmentUrl ?? new URL(`file:///${join(rendererRoot, 'index.html').replaceAll('\\', '/')}`).href
   installNavigationPolicy(window, rendererUrl, rendererRoot)
+  if (developmentUrl !== undefined) {
+    window.webContents.on('console-message', (_event, level, message, line, sourceId) => {
+      console.log(`[renderer:${level}] ${sourceId}:${line} ${message}`)
+    })
+    window.webContents.once('did-finish-load', () => {
+      setTimeout(() => {
+        void window.webContents.executeJavaScript(`(async () => {
+          const frame = document.querySelector('[data-dsh-frame]')
+          const sidebar = document.querySelector('[class*="sidebarCol"]')
+          const sidebarRoot = document.querySelector('[data-dsh-sidebar-root]')
+          const ambient = document.querySelector('[data-dsh-aqua-ambient]')
+          const wallpaper = document.querySelector('[data-dsh-aqua-wallpaper-img]')
+          return {
+            mica: document.documentElement.hasAttribute('data-dsh-float'),
+            compat: document.documentElement.hasAttribute('data-dsh-compat'),
+            frame: frame ? {
+              collapsed: frame.hasAttribute('data-sidebar-collapsed'),
+              background: getComputedStyle(frame).background,
+              width: frame.getBoundingClientRect().width,
+            } : null,
+            sidebar: sidebar ? {
+              width: sidebar.getBoundingClientRect().width,
+              margin: getComputedStyle(sidebar).margin,
+              padding: getComputedStyle(sidebar).padding,
+            } : null,
+            sidebarRoot: sidebarRoot ? {
+              width: sidebarRoot.getBoundingClientRect().width,
+            } : null,
+            wallpaper: wallpaper ? {
+              source: wallpaper.getAttribute('src'),
+              visible: getComputedStyle(wallpaper).display !== 'none',
+            } : null,
+            ambient: ambient ? {
+              background: ambient.getAttribute('data-background'),
+              zIndex: getComputedStyle(ambient).zIndex,
+            } : null,
+            frameBackground: frame ? getComputedStyle(frame).background : null,
+            sidebarBackground: sidebar ? getComputedStyle(sidebar).background : null,
+            sidebarFilter: sidebar ? getComputedStyle(sidebar).backdropFilter : null,
+          }
+        })()`).then(report => console.log('[desktop-appearance:dom]', report)).catch(error => console.error('[desktop-appearance:dom] failed', error))
+      }, 3000)
+    })
+  }
   window.once('ready-to-show', () => window.show())
   window.on('close', (event) => {
     hideWindowOnClose(event, window, explicitQuit)

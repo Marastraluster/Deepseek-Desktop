@@ -14,6 +14,14 @@ export async function stageReleaseInputs() {
   generatePlatformIcons()
   stageHost()
   stageNotices()
+  const existingIdentity = join(resources, 'build-identity.json')
+  if (!existsSync(existingIdentity)) writeBuildIdentity(resources, process.env.DSH_HARNESS_COMMIT ?? '47f943859bef60e4160492346772ded9b24f765a')
+}
+
+export function writeBuildIdentity(directory, harnessCommit) {
+  if (!/^[0-9a-f]{40}$/.test(harnessCommit)) throw new Error(`invalid Harness commit: ${harnessCommit}`)
+  mkdirSync(directory, { recursive: true })
+  writeFileSync(join(directory, 'build-identity.json'), `${JSON.stringify({ harnessCommit }, null, 2)}\n`)
 }
 
 function stageHost() {
@@ -35,7 +43,17 @@ function stageNotices() {
   const harnessNotices = readFileSync(join(root, 'vendor', 'deepseek-harness', 'THIRD_PARTY_NOTICES.md'), 'utf8')
   const harnessLicense = readFileSync(join(root, 'vendor', 'deepseek-harness', 'LICENSE'), 'utf8')
   const nodeLicense = readFileSync(join(resources, 'node', 'LICENSE'), 'utf8')
-  writeFileSync(join(resources, 'THIRD-PARTY-NOTICES.txt'), [
+  const transparentUiLicense = readFileSync(join(root, 'packages', 'dsh-transparent-ui', 'LICENSE'), 'utf8')
+  writeFileSync(join(resources, 'THIRD-PARTY-NOTICES.txt'), buildReleaseNotices({
+    harnessNotices,
+    harnessLicense,
+    nodeLicense,
+    transparentUiLicense,
+  }))
+}
+
+export function buildReleaseNotices({ harnessNotices, harnessLicense, nodeLicense, transparentUiLicense }) {
+  return [
     'DeepSeek Desktop release notices',
     '',
     'DeepSeek Harness license',
@@ -44,9 +62,12 @@ function stageNotices() {
     'Node.js license',
     nodeLicense.trim(),
     '',
+    'DSH Transparent UI Plugin (modified)',
+    transparentUiLicense.trim(),
+    '',
     harnessNotices.trim(),
     '',
-  ].join('\n'))
+  ].join('\n')
 }
 
 function copyFile(source, target) {

@@ -76,6 +76,9 @@ export function composeDesktopEntries(harnessRoot = resolveHarnessRoot()) {
     }, {
       id: 'desktop-connection',
       name: '@deepseek-desktop/connection',
+    }, {
+      id: 'desktop-appearance',
+      name: '@deepseek-desktop/transparent-ui',
     }] }],
   ])
 }

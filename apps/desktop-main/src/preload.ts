@@ -58,3 +58,9 @@ const desktopHarness = Object.freeze({
 })
 
 contextBridge.exposeInMainWorld('desktopHarness', desktopHarness)
+
+contextBridge.exposeInMainWorld('desktopAppearance', Object.freeze({
+  selectBackground: () => ipcRenderer.invoke('desktop-appearance:select'),
+  removeBackground: (assetKey: string) => ipcRenderer.invoke('desktop-appearance:remove', assetKey),
+  assetUrl: (assetKey: string) => ipcRenderer.invoke('desktop-appearance:url', assetKey),
+}))

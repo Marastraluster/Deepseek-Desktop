@@ -32,12 +32,15 @@ Harness agent workflows to Windows, macOS, and Linux desktops.
   move between sessions in one desktop client.
 - **Agent presets**: Choose an Agent preset to adjust collaboration behavior by
   task type.
+- **Custom desktop appearance**: Choose compatibility or Mica glass in General
+  settings, use a local wallpaper, and adjust blur, frost, and background
+  brightness across both the sidebar and conversation area.
 - **Ready-to-run releases**: Packages include the matching Node runtime and
   Host dependency closure, so end users do not need Node.js or pnpm.
 - **Source development remains available**: Install dependencies, run the
   development client, test, and produce native packages from source.
 - **Three-platform delivery**: The release workflow targets Windows x64,
-  macOS Intel/Apple Silicon, and Linux x64.
+  macOS Apple Silicon, and Linux x64.
 
 ## Download a Release
 
@@ -65,8 +68,9 @@ pnpm harness:prepare
 pnpm dev
 ```
 
-`pnpm dev` builds the desktop connection layer, Host, and plugins required by
-the official renderer before starting Electron.
+`pnpm dev` builds the desktop connection layer, Host, transparent appearance
+plugin, and the plugins required by the official renderer before starting
+Electron.
 
 Useful commands:
 

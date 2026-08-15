@@ -165,6 +165,7 @@
     "@deepseek-ai/dsh-workflow": "workspace:*",
     "@deepseek-ai/dsh-workspace": "workspace:*",
     "@deepseek-desktop/connection": "workspace:*",
+    "@deepseek-desktop/transparent-ui": "workspace:*",
     "@deepseek-desktop/ipc-contract": "workspace:*",
     "zod": "^4.4.3"
   }
