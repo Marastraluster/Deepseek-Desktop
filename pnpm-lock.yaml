@@ -106,6 +106,9 @@ importers:
       '@deepseek-ai/dsh-agent-presets':
         specifier: workspace:*
         version: link:../../vendor/deepseek-harness/packages/preset/agent-presets
+      '@deepseek-ai/dsh-agent-tool-presentation':
+        specifier: workspace:*
+        version: link:../../vendor/deepseek-harness/packages/core/agent-tool-presentation
       '@deepseek-ai/dsh-anonymous-user-id':
         specifier: workspace:*
         version: link:../../vendor/deepseek-harness/packages/identity/anonymous-user-id
@@ -262,6 +265,9 @@ importers:
       '@deepseek-ai/dsh-fs':
         specifier: workspace:*
         version: link:../../vendor/deepseek-harness/packages/fs/fs
+      '@deepseek-ai/dsh-fs-local':
+        specifier: workspace:*
+        version: link:../../vendor/deepseek-harness/packages/fs/fs-local
       '@deepseek-ai/dsh-fs-observation-policy':
         specifier: workspace:*
         version: link:../../vendor/deepseek-harness/packages/fs/fs-observation-policy
@@ -436,6 +442,12 @@ importers:
       '@deepseek-ai/dsh-system-prompt':
         specifier: workspace:*
         version: link:../../vendor/deepseek-harness/packages/core/system-prompt
+      '@deepseek-ai/dsh-terminal':
+        specifier: workspace:*
+        version: link:../../vendor/deepseek-harness/packages/terminal/terminal
+      '@deepseek-ai/dsh-terminal-bash':
+        specifier: workspace:*
+        version: link:../../vendor/deepseek-harness/packages/terminal/terminal-bash
       '@deepseek-ai/dsh-timeout':
         specifier: workspace:*
         version: link:../../vendor/deepseek-harness/packages/util/timeout
@@ -448,9 +460,15 @@ importers:
       '@deepseek-ai/dsh-tool-bash':
         specifier: workspace:*
         version: link:../../vendor/deepseek-harness/packages/shell/tool-bash
+      '@deepseek-ai/dsh-tool-bash-persistent':
+        specifier: workspace:*
+        version: link:../../vendor/deepseek-harness/packages/shell/tool-bash-persistent
       '@deepseek-ai/dsh-tool-call-timeout-policy':
         specifier: workspace:*
         version: link:../../vendor/deepseek-harness/packages/guard/timeout-policy
+      '@deepseek-ai/dsh-tool-cordis':
+        specifier: workspace:*
+        version: link:../../vendor/deepseek-harness/packages/extensions/tool-cordis
       '@deepseek-ai/dsh-tool-fs':
         specifier: workspace:*
         version: link:../../vendor/deepseek-harness/packages/fs/tool-fs
@@ -472,6 +490,9 @@ importers:
       '@deepseek-ai/dsh-tool-skill':
         specifier: workspace:*
         version: link:../../vendor/deepseek-harness/packages/skill/tool-skill
+      '@deepseek-ai/dsh-tool-str-replace-editor':
+        specifier: workspace:*
+        version: link:../../vendor/deepseek-harness/packages/fs/tool-str-replace-editor
       '@deepseek-ai/dsh-tool-subagent':
         specifier: workspace:*
         version: link:../../vendor/deepseek-harness/packages/subagent/tool-subagent

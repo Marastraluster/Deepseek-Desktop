@@ -81,6 +81,9 @@ describe('compiled desktop Host', () => {
             value: {
               presets: expect.arrayContaining([
                 expect.objectContaining({ id: 'standard', trust: 'system', isDefault: true }),
+                expect.objectContaining({ id: 'code', trust: 'system' }),
+                expect.objectContaining({ id: 'minimal', trust: 'system' }),
+                expect.objectContaining({ id: 'cordis', trust: 'system' }),
               ]),
             },
           },
@@ -132,6 +135,61 @@ describe('compiled desktop Host', () => {
           },
         },
       })
+
+      for (const agentPreset of ['code', 'minimal', 'cordis']) {
+        const presetWorkspacePath = mkdtempSync(join(tmpdir(), `dsh-desktop-${agentPreset}-`))
+        temporaryPaths.push(presetWorkspacePath)
+        child.stdin.write(`${JSON.stringify({
+          kind: 'request',
+          generation: 1,
+          id: `workspace-create-${agentPreset}`,
+          payload: {
+            type: 'client-request',
+            rpcId: `workspace-create-${agentPreset}`,
+            method: 'workspace.create',
+            payload: { path: presetWorkspacePath },
+          },
+        })}\n`)
+        const createdWorkspace = await messages.next('response', `workspace-create-${agentPreset}`)
+        const presetWorkspaceId = (createdWorkspace.payload as {
+          result: { ok: true; value: { workspace: { workspaceId: string } } }
+        }).result.value.workspace.workspaceId
+
+        child.stdin.write(`${JSON.stringify({
+          kind: 'request',
+          generation: 1,
+          id: `session-create-${agentPreset}`,
+          payload: {
+            type: 'client-request',
+            rpcId: `session-create-${agentPreset}`,
+            method: 'session.create',
+            payload: { workspaceId: presetWorkspaceId },
+          },
+        })}\n`)
+        const createdSession = await messages.next('response', `session-create-${agentPreset}`)
+        const presetSessionId = (createdSession.payload as {
+          result: { ok: true; value: { sessionId: string } }
+        }).result.value.sessionId
+
+        child.stdin.write(`${JSON.stringify({
+          kind: 'request',
+          generation: 1,
+          id: `agent-preset-select-${agentPreset}`,
+          payload: {
+            type: 'client-request',
+            rpcId: `agent-preset-select-${agentPreset}`,
+            method: 'agentPreset.select',
+            payload: { sessionId: presetSessionId, agentPreset },
+          },
+        })}\n`)
+
+        await expect(messages.next('response', `agent-preset-select-${agentPreset}`)).resolves.toMatchObject({
+          payload: {
+            type: 'server-response',
+            result: { ok: true, value: { agentPreset } },
+          },
+        })
+      }
 
       child.stdin.write(`${JSON.stringify({
         kind: 'rpc',
