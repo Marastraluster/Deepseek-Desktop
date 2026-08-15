@@ -16,10 +16,15 @@ describe('background mode lifecycle', () => {
     const window = { hide: vi.fn(), isMinimized: () => true, restore: vi.fn(), show: vi.fn(), focus: vi.fn() }
     expect(hideWindowOnClose(event, window, true)).toBe(false)
     expect(event.preventDefault).not.toHaveBeenCalled()
+    expect(window.hide).not.toHaveBeenCalled()
     expect(shouldKeepProcessAlive(true)).toBe(false)
     showWindow(window)
     expect(window.restore).toHaveBeenCalledOnce()
     expect(window.show).toHaveBeenCalledOnce()
     expect(window.focus).toHaveBeenCalledOnce()
+  })
+
+  it('ignores a tray action when no main window exists', () => {
+    expect(() => showWindow(undefined)).not.toThrow()
   })
 })
