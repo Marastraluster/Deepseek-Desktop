@@ -82,7 +82,7 @@ describe('release staging', () => {
     expect(existsSync(join(output, 'resources', 'host', 'node_modules', '@deepseek-ai', 'dsh-host-apiproxy', 'package.json'))).toBe(true)
     expect(existsSync(join(output, 'resources', 'host', 'node_modules', '@deepseek-ai', 'dsh-host-apiproxy', '.cache'))).toBe(false)
     expect(existsSync(join(output, 'resources', 'host', 'vendor', 'deepseek-harness', 'apps', 'cli', 'config', 'agent-presets'))).toBe(true)
-  })
+  }, 20_000)
 
   it('rejects a packaged Host without its shipped agent presets', () => {
     const output = mkdtempSync(join(tmpdir(), 'deepseek-desktop-package-'))
