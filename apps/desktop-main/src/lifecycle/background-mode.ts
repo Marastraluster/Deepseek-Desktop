@@ -4,6 +4,10 @@ export interface CloseEvent {
 
 export interface BackgroundWindow {
   hide(): void
+  isMinimized(): boolean
+  restore(): void
+  show(): void
+  focus(): void
 }
 
 export function hideWindowOnClose(
@@ -22,4 +26,11 @@ export function hideWindowOnClose(
 
 export function shouldKeepProcessAlive(explicitQuit: boolean): boolean {
   return !explicitQuit
+}
+
+export function showWindow(window: BackgroundWindow | undefined): void {
+  if (window === undefined) return
+  if (window.isMinimized()) window.restore()
+  window.show()
+  window.focus()
 }

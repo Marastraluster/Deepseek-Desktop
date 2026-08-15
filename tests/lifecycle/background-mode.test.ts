@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { hideWindowOnClose, shouldKeepProcessAlive } from '../../apps/desktop-main/src/lifecycle/background-mode.ts'
+import { hideWindowOnClose, shouldKeepProcessAlive, showWindow } from '../../apps/desktop-main/src/lifecycle/background-mode.ts'
 
 describe('background mode lifecycle', () => {
   it('hides an ordinary close and keeps the process alive', () => {
@@ -11,12 +11,15 @@ describe('background mode lifecycle', () => {
     expect(shouldKeepProcessAlive(false)).toBe(true)
   })
 
-  it('allows an explicit quit and stops keeping the process alive', () => {
+  it('allows explicit quit and restores a minimized window', () => {
     const event = { preventDefault: vi.fn() }
-    const window = { hide: vi.fn(), isMinimized: () => false, restore: vi.fn(), show: vi.fn(), focus: vi.fn() }
+    const window = { hide: vi.fn(), isMinimized: () => true, restore: vi.fn(), show: vi.fn(), focus: vi.fn() }
     expect(hideWindowOnClose(event, window, true)).toBe(false)
     expect(event.preventDefault).not.toHaveBeenCalled()
-    expect(window.hide).not.toHaveBeenCalled()
     expect(shouldKeepProcessAlive(true)).toBe(false)
+    showWindow(window)
+    expect(window.restore).toHaveBeenCalledOnce()
+    expect(window.show).toHaveBeenCalledOnce()
+    expect(window.focus).toHaveBeenCalledOnce()
   })
 })
